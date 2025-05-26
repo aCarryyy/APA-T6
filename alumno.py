@@ -1,3 +1,8 @@
+"""
+ALEX CARRIÓN GONZÁLEZ
+ALUMNO.PY
+"""
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +47,39 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+    
+import re
+
+def leeAlumnos(ficAlumnos):
+    """
+    Lee un fichero y devuelve un diccionario {nombre: Alumno}
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for a in alumnos:
+    ...     print(alumnos[a])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    dicc = {}
+
+    exp_id = r'\s*(?P<id>\d+)\s+'
+    exp_nom = r'(?P<nom>[\w\s]+?)\s+'
+    exp_notes = r'(?P<notes>[\d.\s]+)\s*'
+    expresion = re.compile(exp_id + exp_nom + exp_notes)
+
+    with open(ficAlumnos, 'rt', encoding='utf-8') as fp:
+        for linea in fp:
+            match = expresion.search(linea)
+            if match:
+                id = int(match['id'])
+                nom = ' '.join(match['nom'].split())
+                notes = [float(n) for n in match['notes'].split()]
+                dicc[nom] = Alumno(nom, id, notes)
+
+    return dicc
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(verbose=True, optionflags=doctest.NORMALIZE_WHITESPACE)
